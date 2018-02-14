@@ -1,0 +1,48 @@
+#!/bin/bash
+
+readonly red=$(tput setaf 1) #  red
+readonly grn=$(tput setaf 2) #  green
+readonly ylw=$(tput setaf 3) #  yellow
+readonly blu=$(tput setaf 4) #  blue
+readonly cya=$(tput setaf 6) #  cyan
+readonly txtbld=$(tput bold) # Bold
+readonly bldred=$txtbld$red  #  red
+readonly bldgrn=$txtbld$grn  #  green
+readonly bldylw=$txtbld$ylw  #  yellow
+readonly bldblu=$txtbld$blu  #  blue
+readonly bldcya=$txtbld$cya  #  cyan
+readonly txtrst=$(tput sgr0) # Reset
+
+
+function ask {
+  local opt=
+  [[ $1 = -s ]] && opt="-s" && shift
+  local question=$1
+  local default=$2
+  local response
+  read $opt -rep "$txtrst$grn$question $txtrst" -i "$default" response
+  [[ $opt = -s ]] && echo >&2
+  if [[ -n $response ]]; then
+    echo "$response"
+    return 0
+  else
+    return 1
+  fi
+}
+
+echo "Beiging netloop..."
+
+address=$(ask "what is the url?")
+
+while x=(`ping -c1 google.com 2>&1 | grep unknown`); do
+if [ ! "$x" = "" ]; then
+        echo "It's down!! Attempting to restart."
+        service network restart
+        sleep 5
+        $address
+else
+        sleep 30
+        x=(`ping -c1 google.com 2>&1 | grep unknown`)
+            
+fi
+done
